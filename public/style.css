@@ -1,0 +1,146 @@
+:root {
+  --bg: #f4f6f9;
+  --fg: #333;
+  --user-bg: #3498db;
+  --ai-bg: #27ae60;
+  --input-border: #ccc;
+  --card-bg: white;
+  --text: #333;
+  --btn-bg: #2980b9;
+}
+
+[data-theme="dark"] {
+  --bg: #1a1a1a;
+  --fg: #e0e0e0;
+  --user-bg: #1e88e5;
+  --ai-bg: #2e7d32;
+  --input-border: #555;
+  --card-bg: #2d2d2d;
+  --text: #e0e0e0;
+  --btn-bg: #1976d2;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  transition: background 0.3s;
+}
+
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+h1 { text-align: center; margin-bottom: 10px; }
+p { text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: -10px; }
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.controls select, .controls button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chat-box {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--input-border);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background: #1e1e1e0a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message {
+  max-width: 75%;
+  padding: 12px;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.user {
+  background: var(--user-bg);
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.ai {
+  background: var(--ai-bg);
+  color: white;
+  align-self: flex-start;
+}
+
+.ai pre { margin: 10px 0; overflow-x: auto; }
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+button {
+  background: var(--btn-bg);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#attachFile { background: #7f8c8d; }
+#attachFile:hover { background: #95a5a6; }
+
+#file-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+  flex-wrap: wrap;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.suggestion {
+  background: #2d2d2d;
+  color: #4fac7d;
+  font-family: 'Courier New', monospace;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  cursor: pointer;
+  border: 1px dashed #4fac7d;
+  display: none;
+}

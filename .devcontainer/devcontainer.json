@@ -1,0 +1,23 @@
+{
+  "name": "chatGenZ - AI Coding Assistant",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeVersion": "18"
+    }
+  },
+  "postCreateCommand": "chmod +x .devcontainer/setup.sh && ./.devcontainer/setup.sh",
+  "forwardPorts": [3000],
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "ms-vscode.live-server",
+        "ms-vscode.vscode-json"
+      ]
+    }
+  }
+}

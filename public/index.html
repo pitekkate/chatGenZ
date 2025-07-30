@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💬 chatGenZ</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <h1>💬 chatGenZ</h1>
+    <p style="text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: -10px;">
+      AI Coding Assistant Lokal
+    </p>
+
+    <div class="controls">
+      <div>
+        <button id="themeToggle">🌙 Dark Mode</button>
+        <select id="modelSelect">
+          <option value="phi3:mini" selected>🧠 phi3:mini (rekomendasi)</option>
+          <option value="llama3">🦙 Llama3</option>
+          <option value="mistral">⚡ Mistral</option>
+        </select>
+      </div>
+      <div>
+        <button id="clearChat">🗑️ Bersihkan</button>
+        <button id="exportChat">💾 Export</button>
+        <select id="exportFormat">
+          <option value="md">Markdown (.md)</option>
+          <option value="txt">Text (.txt)</option>
+        </select>
+        <button id="importChat">📂 Impor</button>
+        <input type="file" id="fileInputImport" accept=".md,.txt" style="display: none;" />
+      </div>
+    </div>
+
+    <div id="chat" class="chat-box"></div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Tanya atau tulis kode..." />
+      <button id="attachFile" title="Lampirkan file">📎</button>
+      <input type="file" id="fileInput" accept=".txt,.js,.py" style="display: none;" />
+      <button onclick="sendMessage()">Kirim</button>
+    </div>
+
+    <div id="file-preview"></div>
+
+    <div class="quick-actions">
+      <button onclick="requestAutocomplete()">💡 Autocomplete</button>
+      <button onclick="runCode()">▶️ Run Kode</button>
+      <button onclick="refactorCode()">♻️ Refactor</button>
+      <button onclick="debugError()">🐞 Debug Error</button>
+    </div>
+
+    <div id="suggestion" class="suggestion"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
