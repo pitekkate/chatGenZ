@@ -1,22 +1,30 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   --bg: #f4f6f9;
   --fg: #333;
+  --sidebar-bg: #2c3e50;
+  --sidebar-fg: #ecf0f1;
   --user-bg: #3498db;
   --ai-bg: #27ae60;
   --input-border: #ccc;
   --card-bg: white;
-  --text: #333;
   --btn-bg: #2980b9;
 }
 
 [data-theme="dark"] {
   --bg: #1a1a1a;
   --fg: #e0e0e0;
+  --sidebar-bg: #1e1e1e;
+  --sidebar-fg: #bdc3c7;
   --user-bg: #1e88e5;
   --ai-bg: #2e7d32;
   --input-border: #555;
   --card-bg: #2d2d2d;
-  --text: #e0e0e0;
   --btn-bg: #1976d2;
 }
 
@@ -24,47 +32,119 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--fg);
-  transition: background 0.3s;
+  transition: background 0.3s, color 0.3s;
+  height: 100vh;
+  display: flex;
 }
 
-.container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--card-bg);
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-h1 { text-align: center; margin-bottom: 10px; }
-p { text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: -10px; }
+/* SIDEBAR KIRI */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-fg);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #444;
+}
 
-.controls {
+.sidebar-header {
+  padding: 15px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #444;
 }
 
-.controls select, .controls button {
-  padding: 6px 10px;
+.sidebar-header h2 {
+  font-size: 1.3em;
+  margin: 0;
+}
+
+#newChatBtn {
+  width: 32px;
+  height: 32px;
+  background: #3498db;
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 50%;
+  font-size: 1.2em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#newChatBtn:hover {
+  background: #2980b9;
+}
+
+.sessions-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.session-item {
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-item:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.session-item.active {
+  background: #3498db;
+  font-weight: bold;
+}
+
+.session-item .delete-session {
+  float: right;
+  color: #e74c3c;
+  opacity: 0;
   cursor: pointer;
 }
 
+.session-item:hover .delete-session {
+  opacity: 1;
+}
+
+/* KONTEN KANAN */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
 .chat-box {
-  height: 400px;
+  flex: 1;
   overflow-y: auto;
   border: 1px solid var(--input-border);
-  padding: 10px;
+  padding: 15px;
   border-radius: 8px;
   margin-bottom: 15px;
   background: #1e1e1e0a;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .message {
@@ -87,7 +167,24 @@ p { text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: -10px; }
   align-self: flex-start;
 }
 
-.ai pre { margin: 10px 0; overflow-x: auto; }
+.ai pre {
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.controls button, .controls select {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
 .input-area {
   display: flex;
@@ -111,17 +208,6 @@ button {
   padding: 10px;
   border-radius: 8px;
   cursor: pointer;
-}
-
-#attachFile { background: #7f8c8d; }
-#attachFile:hover { background: #95a5a6; }
-
-#file-preview {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 5px 0;
-  flex-wrap: wrap;
 }
 
 .quick-actions {

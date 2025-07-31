@@ -1,107 +1,165 @@
-const chat = document.getElementById('chat');
-const userInput = document.getElementById('userInput');
-const themeToggle = document.getElementById('themeToggle');
-const clearChatBtn = document.getElementById('clearChat');
-const exportChatBtn = document.getElementById('exportChat');
-const exportFormat = document.getElementById('exportFormat');
-const suggestionEl = document.getElementById('suggestion');
+// === STATE ===
+let chatSessions = JSON.parse(localStorage.getItem('chatSessions')) || [];
+let currentSessionId = localStorage.getItem('currentSessionId');
 
-let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
-let selectedModel = localStorage.getItem('ollama-model') || 'phi3:3.8b-mini-q4_0';
-
-// Theme
-document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
-themeToggle.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-
-// Load model
-document.getElementById('modelSelect').value = selectedModel;
-
-function loadChat() {
-  chat.innerHTML = '';
-  chatHistory.forEach(msg => appendMessage(msg.text, msg.sender));
-  chat.scrollTop = chat.scrollHeight;
+// Jika tidak ada sesi, buat baru
+if (chatSessions.length === 0) {
+  const firstId = 'session_' + Date.now();
+  chatSessions.push({
+    id: firstId,
+    name: 'Chat Baru',
+    createdAt: new Date().toISOString(),
+    messages: []
+  });
+  currentSessionId = firstId;
+  localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
 }
 
+if (!currentSessionId) {
+  currentSessionId = chatSessions[0].id;
+}
+
+// === DOM Elements ===
+const chatSessionsEl = document.getElementById('chatSessions');
+const chatEl = document.getElementById('chat');
+const userInput = document.getElementById('userInput');
+const newChatBtn = document.getElementById('newChatBtn');
+
+// === Load UI ===
+function renderSessions() {
+  chatSessionsEl.innerHTML = '';
+  chatSessions.forEach(session => {
+    const div = document.createElement('div');
+    div.className = `session-item ${session.id === currentSessionId ? 'active' : ''}`;
+    div.innerHTML = `
+      ${session.name}
+      <span class="delete-session" onclick="deleteSession(event, '${session.id}')">×</span>
+    `;
+    div.onclick = (e) => {
+      if (!e.target.classList.contains('delete-session')) {
+        switchSession(session.id);
+      }
+    };
+    chatSessionsEl.appendChild(div);
+  });
+}
+
+function loadCurrentSession() {
+  const session = chatSessions.find(s => s.id === currentSessionId);
+  if (!session) return;
+  chatEl.innerHTML = '';
+  session.messages.forEach(msg => {
+    appendMessage(msg.text, msg.sender);
+  });
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// === Append Message ===
 function appendMessage(html, sender) {
   const el = document.createElement('div');
   el.classList.add('message', sender);
   el.innerHTML = html;
   Prism.highlightAllUnder(el);
-  chat.appendChild(el);
-  chat.scrollTop = chat.scrollHeight;
+  chatEl.appendChild(el);
+  chatEl.scrollTop = chatEl.scrollHeight;
 }
 
-themeToggle.addEventListener('click', () => {
-  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeToggle.textContent = t === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+// === Switch Session ===
+function switchSession(id) {
+  const session = chatSessions.find(s => s.id === id);
+  if (!session) return;
+  currentSessionId = id;
+  localStorage.setItem('currentSessionId', id);
+  loadCurrentSession();
+  renderSessions();
+}
+
+// === New Session ===
+newChatBtn.addEventListener('click', () => {
+  const id = 'session_' + Date.now();
+  const name = `Chat Baru ${chatSessions.length + 1}`;
+  chatSessions.push({
+    id,
+    name,
+    createdAt: new Date().toISOString(),
+    messages: []
+  });
+  currentSessionId = id;
+  localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+  localStorage.setItem('currentSessionId', id);
+  renderSessions();
+  chatEl.innerHTML = '';
 });
 
-clearChatBtn.addEventListener('click', () => {
-  if (confirm('Hapus semua riwayat?')) {
-    chatHistory = [];
-    localStorage.removeItem('chatHistory');
-    loadChat();
+// === Delete Session ===
+function deleteSession(e, id) {
+  e.stopPropagation();
+  if (chatSessions.length === 1) {
+    alert('Minimal satu sesi harus ada.');
+    return;
   }
-});
+  if (confirm('Hapus sesi ini?')) {
+    chatSessions = chatSessions.filter(s => s.id !== id);
+    if (currentSessionId === id) {
+      currentSessionId = chatSessions[0].id;
+      localStorage.setItem('currentSessionId', currentSessionId);
+    }
+    localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+    renderSessions();
+    loadCurrentSession();
+  }
+}
 
-exportChatBtn.addEventListener('click', () => {
-  const f = exportFormat.value;
-  const n = 'chat_' + new Date().toISOString().slice(0,16).replace('T','_') + '.' + f;
-  let c = f === 'md' ? '# chatGenZ\n> ' + new Date().toLocaleString() + '\n\n' : 'chatGenZ\n' + new Date().toLocaleString() + '\n\n';
-  chatHistory.forEach(m => c += (m.sender==='user'?'You':'AI') + ':\n\n' + m.text.replace(/<[^>]*>/g, '') + '\n\n');
-  const b = new Blob([c], {type:'text/plain'});
-  const u = URL.createObjectURL(b);
-  const a = document.createElement('a');
-  a.href = u; a.download = n; a.click(); URL.revokeObjectURL(u);
-});
-
+// === Send Message ===
 async function sendMessage() {
   const msg = userInput.value.trim();
   if (!msg) return;
 
+  const session = chatSessions.find(s => s.id === currentSessionId);
+  if (!session) return;
+
   appendMessage(msg, 'user');
-  chatHistory.push({ text: msg, sender: 'user' });
+  session.messages.push({ text: msg, sender: 'user' });
 
   userInput.value = '';
-  suggestionEl.style.display = 'none';
 
   try {
     const res = await fetch('/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, model: selectedModel })
+      body: JSON.stringify({ message: msg, model: getSelectedModel() })
     });
     const data = await res.json();
     const reply = data.reply || 'Tidak ada respons.';
     appendMessage(reply, 'ai');
-    chatHistory.push({ text: reply, sender: 'ai' });
+    session.messages.push({ text: reply, sender: 'ai' });
   } catch (err) {
-    appendMessage('Gagal terhubung ke Ollama.', 'ai');
+    const errorMsg = 'Gagal terhubung ke Ollama.';
+    appendMessage(errorMsg, 'ai');
+    session.messages.push({ text: errorMsg, sender: 'ai' });
   } finally {
-    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
   }
 }
 
-userInput.addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
+// === Helper: Dapatkan model dari dropdown
+function getSelectedModel() {
+  const select = document.getElementById('modelSelect');
+  return select ? select.value : 'phi3:3.8b-mini-q4_0';
+}
 
-document.getElementById('modelSelect').addEventListener('change', e => {
-  selectedModel = e.target.value;
-  localStorage.setItem('ollama-model', selectedModel);
-  appendMessage(`✅ Model: **${selectedModel}**`, 'ai');
-});
-
+// === Quick Actions (tetap sama)
 async function requestAutocomplete() {
   const code = userInput.value.trim();
   if (!code) return;
   const res = await fetch('/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: `Lanjutkan:\n\n${code}`, model: selectedModel })
+    body: JSON.stringify({ message: `Lanjutkan:\n\n${code}`, model: getSelectedModel() })
   });
   const data = await res.json();
   const sug = data.reply || '';
+  const suggestionEl = document.getElementById('suggestion');
   suggestionEl.textContent = sug;
   suggestionEl.style.display = 'block';
   suggestionEl.onclick = () => { userInput.value += ' ' + sug; suggestionEl.style.display = 'none'; };
@@ -126,10 +184,25 @@ async function debugError() {
   const res = await fetch('/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: `Debug error:\n\n${err}`, model: selectedModel })
+    body: JSON.stringify({ message: `Debug error:\n\n${err}`, model: getSelectedModel() })
   });
   const data = await res.json();
   appendMessage(`🐞 Analisis:\n\n${data.reply || '...'}`, 'ai');
 }
 
-loadChat();
+// === Theme Toggle ===
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.textContent = localStorage.getItem('theme') === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+
+themeToggle.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+});
+
+// === Init ===
+renderSessions();
+loadCurrentSession();

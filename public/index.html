@@ -9,44 +9,44 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
 <body>
-  <div class="container">
-    <h1>💬 chatGenZ</h1>
-    <p style="text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: -10px;">
-      AI Coding Assistant Lokal
-    </p>
+  <div class="app-container">
+    
+    <!-- Sidebar Kiri: Riwayat Sesi -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>💬 chatGenZ</h2>
+        <button id="newChatBtn" title="Sesi Baru">+</button>
+      </div>
+      <div id="chatSessions" class="sessions-list">
+        <!-- Sesi akan muncul di sini -->
+      </div>
+    </aside>
 
-    <div class="controls">
-      <div>
+    <!-- Konten Utama Kanan: Chat Aktif -->
+    <main class="main-content">
+      <div id="chat" class="chat-box"></div>
+
+      <div class="controls">
         <button id="themeToggle">🌙 Dark Mode</button>
         <select id="modelSelect">
           <option value="phi3:3.8b-mini-q4_0" selected>🧠 phi3 (rekomendasi)</option>
           <option value="llama3:8b">🦙 Llama3</option>
         </select>
       </div>
-      <div>
-        <button id="clearChat">🗑️ Bersihkan</button>
-        <button id="exportChat">💾 Export</button>
-        <select id="exportFormat">
-          <option value="md">Markdown</option>
-          <option value="txt">Text</option>
-        </select>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Tanya sesuatu..." />
+        <button onclick="sendMessage()">Kirim</button>
       </div>
-    </div>
 
-    <div id="chat" class="chat-box"></div>
+      <div class="quick-actions">
+        <button onclick="requestAutocomplete()">💡 Autocomplete</button>
+        <button onclick="runCode()">▶️ Run Kode</button>
+        <button onclick="debugError()">🐞 Debug</button>
+      </div>
 
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Tanya sesuatu..." />
-      <button onclick="sendMessage()">Kirim</button>
-    </div>
-
-    <div class="quick-actions">
-      <button onclick="requestAutocomplete()">💡 Autocomplete</button>
-      <button onclick="runCode()">▶️ Run Kode</button>
-      <button onclick="debugError()">🐞 Debug</button>
-    </div>
-
-    <div id="suggestion" class="suggestion"></div>
+      <div id="suggestion" class="suggestion"></div>
+    </main>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
