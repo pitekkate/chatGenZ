@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "🔥 Starting Ollama..."
 ollama serve &
-sleep 10
+sleep 15
 echo "🚀 Starting chatGenZ..."
 npm run dev
