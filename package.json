@@ -1,7 +1,7 @@
 {
   "name": "chatgenz",
-  "version": "2.0.0",
-  "description": "Local AI coding assistant with Ollama. Lightweight, offline, and ready for GitHub Codespaces.",
+  "version": "1.1.0",
+  "description": "Local AI coding assistant with Ollama. Works in GitHub Codespaces.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -14,7 +14,7 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["ai", "coding", "chat", "ollama", "local-llm", "phi3", "chatgenz"],
+  "keywords": ["ai", "coding", "chat", "ollama", "phi3", "chatgenz"],
   "author": "pitekkate",
   "license": "MIT"
 }
