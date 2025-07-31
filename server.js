@@ -9,7 +9,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 app.post('/chat', (req, res) => {
-  const { message, model = 'phi3:3.8b-mini-q4_0' } = req.body;
+  const { message, model = 'phi3:mini' } = req.body;
   if (!message) return res.status(400).json({ error: 'Message required' });
 
   console.log(`[Model] ${model} | Prompt: ${message.substring(0, 50)}...`);
