@@ -10,25 +10,38 @@ else
   echo "✅ Ollama already installed."
 fi
 
-# 2. Pull lightweight model
-echo "🧠 Downloading phi3:mini (fast & lightweight for coding)..."
-ollama pull phi3:mini
+# 2. Pull lightweight model (quantized, low RAM)
+echo "🧠 Downloading phi3:3.8b-mini-q4_0 (optimized for low RAM)..."
+ollama pull phi3:3.8b-mini-q4_0
 
-# 3. Install Node.js dependencies
-if [ -f "../package.json" ]; then
-  cd .. && npm install
-  echo "✅ Node.js dependencies installed."
-else
-  echo "❌ package.json not found!"
+# 3. Ensure we are in the correct workspace directory
+WORKSPACE_DIR=$(find /workspaces -mindepth 1 -maxdepth 1 -type d | head -n 1)
+if [ -z "$WORKSPACE_DIR" ]; then
+  echo "❌ Tidak ditemukan folder di /workspaces"
   exit 1
 fi
 
-# 4. Create start script
+cd "$WORKSPACE_DIR" || { echo "❌ Gagal masuk ke $WORKSPACE_DIR"; exit 1; }
+
+echo "📁 Masuk ke direktori: $(pwd)"
+
+# 4. Check for package.json
+if [ ! -f "package.json" ]; then
+  echo "❌ File 'package.json' tidak ditemukan!"
+  echo "💡 Pastikan kamu upload semua file ke repo GitHub."
+  exit 1
+fi
+
+# 5. Install Node.js dependencies
+echo "📦 Installing Node.js dependencies..."
+npm install
+
+# 6. Create start script
 cat > start.sh << 'EOF'
 #!/bin/bash
 echo "🔥 Starting Ollama server..."
 ollama serve &
-sleep 10
+sleep 15
 
 echo "🚀 Starting chatGenZ server..."
 npm run dev
@@ -36,5 +49,6 @@ EOF
 
 chmod +x start.sh
 
-echo "✅ Setup selesai! Jalankan: ./start.sh"
-echo "   Lalu buka Port 3000 untuk mengakses chatGenZ"
+echo "✅ Setup selesai!"
+echo "💡 Jalankan: ./start.sh"
+echo "   Lalu klik 'Port 3000' di panel bawah untuk membuka chatGenZ"
